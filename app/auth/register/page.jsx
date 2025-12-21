@@ -10,12 +10,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, CheckCircle } from "lucide-react"
+import toast from 'react-hot-toast'
 
 const registerSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
-    phone: z.string().min(10, "Invalid phone number"),
+    phoneNumber: z.string().min(10, "Invalid phone number"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
   })
@@ -23,6 +24,10 @@ const registerSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   })
+
+
+  //Test 
+  
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -38,6 +43,83 @@ export default function RegisterPage() {
 
   const onSubmit = async (data) => {
     setIsLoading(true)
+
+
+
+
+
+    try{
+      const response = await fetch (`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/sign-up`, {
+         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
+        credentials: "include", // Important: This sends and receives cookies
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phoneNumber:data.phoneNumber,
+          password: data.password,
+          
+        }),     
+      })
+
+
+       const result = await response.json()
+
+            // Check if request failed
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to sign in")
+      }
+
+       // Success! Store user data
+      if (result?.user) {
+        // Store user data in localStorage
+        localStorage.setItem("user", JSON.stringify(result.user))
+        
+        // Debug: Log the user object to see what we're getting
+         console.log("User object received:", result.user)
+        console.log("User role:", result.user.role)
+
+        // Show success message
+        toast.success("Login successful!")
+
+        // Small delay for better UX
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+
+      
+
+
+              // Route based on user role (check exact string match)
+        const userRole = result.user.role?.toLowerCase().trim()
+        
+        if (userRole === "admin") {
+          console.log("Redirecting to admin dashboard")
+          router.push("/admin")
+        } else if (userRole === "user") {
+          console.log("Redirecting to reseller dashboard")
+          router.push("/reseller")
+        } else {
+          // Default route if role is not recognized
+          console.warn("Unknown role:", result.user.role, "- redirecting to dashboard")
+          router.push("/")
+        }
+      } else {
+        throw new Error("No user data returned from server")
+      }
+
+
+    } catch (error) {
+      console.error("Login error:", error)
+      toast.error(error.message || "Failed to sign in. Please check your credentials.")
+    } finally {
+      setIsLoading(false)
+    }
+    
+
+
     await new Promise((resolve) => setTimeout(resolve, 1500))
     setIsLoading(false)
     setIsSuccess(true)
@@ -84,8 +166,8 @@ export default function RegisterPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
-            <Input id="phone" {...register("phone")} />
-            {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
+            <Input id="phone" {...register("phoneNumber")} />
+            {errors.phoneNumber && <p className="text-xs text-red-500">{errors.phoneNumber.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>

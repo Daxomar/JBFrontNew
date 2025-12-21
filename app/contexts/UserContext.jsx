@@ -6,8 +6,8 @@ import toast from "react-hot-toast"
 
 const UserContext = createContext(null)
 
-const BASE_URL = "https://2c8186ee0c04.ngrok-free.app/api/v1"
-const CURRENT_USER_ID = "6939e7a48945df1d67c26f00"
+
+const CURRENT_USER_ID = "6942af84c58df50e5dd16d00"
 
 export function UserProvider({ children }) {
 
@@ -18,12 +18,13 @@ export function UserProvider({ children }) {
 
     console.log("🟢 fetchUserData called")
     try {
-      const response = await fetch(`${BASE_URL}/users/me?userId=${CURRENT_USER_ID}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/me`, {
         method: "GET",
         headers: { 
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true"
         },
+      credentials: "include",
       })
 
       if (!response.ok) {
@@ -55,7 +56,7 @@ export function UserProvider({ children }) {
     isError:isErrorReseller,
     refetch,
   } = useQuery({
-    queryKey: ["userData", CURRENT_USER_ID],
+    queryKey: ["userData",],
     queryFn: fetchUserData,
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,

@@ -27,23 +27,23 @@ export default function ResellerEarningsPage() {
 
 
   //TEST 
-  const BASE_URL = "https://2c8186ee0c04.ngrok-free.app/api/v1"
-  const CURRENT_USER_ID = "6939e7a48945df1d67c26f00"
+
+  const CURRENT_USER_ID = "6942af84c58df50e5dd16d00"
 
 
   //FETCH COMMISION QUERY
   const fetchRecentCommissions = async () => {
     try {
       const response = await fetch(
-        `${BASE_URL}/commissions/my-commissions?resellerId=${CURRENT_USER_ID}&page=1&limit=5`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/commissions/my-commissions?&page=1&limit=5`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "true"
           },
-        }
-      );
+      credentials: "include",
+      })
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
@@ -72,8 +72,9 @@ export default function ResellerEarningsPage() {
     isLoading: isLoadingCommissions,
     isError: isErrorCommissions,
   } = useQuery({
-    queryKey: ["recentCommissions", CURRENT_USER_ID],
+    queryKey: ["recentCommissions", Reseller?._id],
     queryFn: fetchRecentCommissions,
+    enabled: !!Reseller?._id
   })
 
 
@@ -89,7 +90,7 @@ export default function ResellerEarningsPage() {
   const fetchRecentPayouts = async () => {
     try {
       const response = await fetch(
-        `${BASE_URL}/payout/my-payouts?resellerId=${CURRENT_USER_ID}&page=1&limit=5`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/payout/my-payouts?&page=1&limit=5`,
         {
           method: "GET",
           headers: {
@@ -97,8 +98,9 @@ export default function ResellerEarningsPage() {
 
             "ngrok-skip-browser-warning": "true",
           },
-        }
-      )
+      credentials: "include",
+      })
+
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))

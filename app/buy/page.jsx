@@ -104,7 +104,7 @@ const fetchResellerCommission = async () => {
       };
     }
     
-    const response = await fetch(`https://2c8186ee0c04.ngrok-free.app/api/v1/users/public/commission/${resellerCode}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/public/commission/${resellerCode}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -154,7 +154,7 @@ const fetchResellerCommission = async () => {
   } = useQuery({
     queryKey: ["resellerCommission"],
     queryFn: fetchResellerCommission,
- 
+    
   });
 
 
@@ -181,7 +181,7 @@ const fetchResellerCommission = async () => {
     
     try {
       const response = await fetch(
-        `https://2c8186ee0c04.ngrok-free.app/api/v1/payments/paystack/verify/${reference}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/paystack/verify/${reference}`,
         {
           method: 'GET',
           headers: { 
@@ -237,7 +237,7 @@ useEffect(() => {
 const fetchBundles = async () => {
   try {
     //I will replace this with the BASE_URL from .env later
-    const response = await fetch(`https://2c8186ee0c04.ngrok-free.app/api/v1/bundles/getBundleFromDb`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/bundles/getBundleFromDb`, {
       method: "GET",
       headers: { 
         "Content-Type": "application/json",
@@ -280,6 +280,7 @@ const {
 } = useQuery({
   queryKey: ["bundles"],
   queryFn: fetchBundles,
+  enabled: !!resellerData?.commissionRate
 });
 
 console.log("This is current data:", data);
@@ -314,7 +315,7 @@ console.log("Bundles to display:", bundles);
     setProcessing(true)
    try {
     // Call your backend to initialize payment
-    const response = await fetch('https://2c8186ee0c04.ngrok-free.app/api/v1/payments/paystack/initialize', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/paystack/initialize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

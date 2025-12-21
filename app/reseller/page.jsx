@@ -561,10 +561,10 @@ import toast from "react-hot-toast"
 import { useUser } from "../contexts/UserContext"
 
 // Base URL - move to .env later
-const BASE_URL = "https://2c8186ee0c04.ngrok-free.app/api/v1"
+
 
 // Manually set userId for now - REMEMBER TO REPLACE WITH AUTH
-const CURRENT_USER_ID = "6939e7a48945df1d67c26f00"
+const CURRENT_USER_ID = "6942af84c58df50e5dd16d00"
 
 export default function ResellerDashboard() {
   const [copied, setCopied] = useState(false)
@@ -579,13 +579,14 @@ export default function ResellerDashboard() {
   // Fetch referral link
   const fetchReferralLink = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/users/reseller-link?userId=${CURRENT_USER_ID}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/reseller-link`, {
         method: "GET",
         headers: { 
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true"
         },
-      });
+        credentials: "include",
+      })
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
@@ -640,15 +641,15 @@ export default function ResellerDashboard() {
   const fetchRecentCommissions = async () => {
     try {
       const response = await fetch(
-        `${BASE_URL}/commissions/my-commissions?resellerId=${CURRENT_USER_ID}&page=1&limit=5`, 
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/commissions/my-commissions?&page=1&limit=5`, 
         {
           method: "GET",
           headers: { 
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "true"
           },
-        }
-      );
+        credentials: "include",
+      })
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
@@ -679,8 +680,9 @@ export default function ResellerDashboard() {
     isLoading: isLoadingReferral,
     isError: isErrorReferral,
   } = useQuery({
-    queryKey: ["referralLink", CURRENT_USER_ID],
+    queryKey: ["referralLink", Reseller?._id],
     queryFn: fetchReferralLink,
+    enabled: !!Reseller?._id
   });
 
   // Query: Reseller Data (replaces commission stats)
@@ -699,8 +701,9 @@ export default function ResellerDashboard() {
     isLoading: isLoadingCommissions,
     isError: isErrorCommissions,
   } = useQuery({
-    queryKey: ["recentCommissions", CURRENT_USER_ID],
+    queryKey: ["recentCommissions", Reseller?._id],
     queryFn: fetchRecentCommissions,
+    enabled: !!Reseller?._id
   });
 
   // ============================================

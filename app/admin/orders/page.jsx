@@ -72,7 +72,7 @@ export default function TransactionsPage() {
   // Mark as delivered mutation
   const deliveredMutation = useMutation({
     mutationFn: async (transactionId) => {
-      const response = await fetch(`${BASE_URL}/transactions/${transactionId}/delivery`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/${transactionId}/delivery`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export default function TransactionsPage() {
   // Mark as failed mutation
   const failedMutation = useMutation({
     mutationFn: async ({ transactionId, reason }) => {
-      const response = await fetch(`${BASE_URL}/transactions/${transactionId}/delivery`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/${transactionId}/delivery`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

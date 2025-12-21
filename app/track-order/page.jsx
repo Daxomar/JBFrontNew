@@ -15,7 +15,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://2c8186ee0c04.ngrok-
 // API function to track orders
 const trackOrdersByPhone = async (phoneNumber, page = 1) => {
   const response = await fetch(
-    `https://2c8186ee0c04.ngrok-free.app/api/v1/order/track?phoneNumber=${phoneNumber}&page=${page}&limit=10`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/order/track?phoneNumber=${phoneNumber}&page=${page}&limit=10`,
     {
       method: "GET",
       headers: {

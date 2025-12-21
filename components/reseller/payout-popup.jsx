@@ -356,7 +356,7 @@ import { Loader2, AlertCircle, Wallet, CheckCircle } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 // Base URL  test
-const BASE_URL = "https://2c8186ee0c04.ngrok-free.app/api/v1"
+
 const CURRENT_USER_ID = "6939e7a48945df1d67c26f00" // Replace with actual auth
 
 // Validation schema
@@ -422,7 +422,7 @@ export function PayoutPopup({ availableBalance = 0, onSuccess }) {
 
     //I have to later make the needed function for this wrapped in auth logic
     mutationFn: async (data) => {
-      const response = await fetch(`${BASE_URL}/payout/request`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payout/request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -436,7 +436,9 @@ export function PayoutPopup({ availableBalance = 0, onSuccess }) {
           amount: parseFloat(data.amount),
           password: data.password,
         }),
+           credentials: "include",
       })
+
 
       
       const result = await response.json()

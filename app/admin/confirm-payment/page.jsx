@@ -766,8 +766,6 @@ import toast from "react-hot-toast"
 
 
 
-//TEST FOR NOW
-const BASE_URL = "https://2c8186ee0c04.ngrok-free.app/api/v1"
 
 
 
@@ -798,14 +796,16 @@ export default function ConfirmPaymentPage() {
         params.append("status", statusFilter)
       }
 
-      const response = await fetch(`${BASE_URL}/payout/all?${params.toString()}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payout/all?${params.toString()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
           "ngrok-skip-browser-warning": "true",
         },
+            credentials: "include",
       })
+
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))
@@ -843,7 +843,7 @@ export default function ConfirmPaymentPage() {
   // Confirm payout mutation
   const confirmMutation = useMutation({
     mutationFn: async (payoutId) => {
-      const response = await fetch(`${BASE_URL}/payout/${payoutId}/process`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payout/${payoutId}/process`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -853,7 +853,9 @@ export default function ConfirmPaymentPage() {
           action: "approve",
           transactionReference: `JPAY-${Date.now()}` // You can customize this
         }),
+           credentials: "include",
       })
+
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))
@@ -882,7 +884,7 @@ export default function ConfirmPaymentPage() {
   // Reject payout mutation
   const rejectMutation = useMutation({
     mutationFn: async ({ payoutId, reason }) => {
-      const response = await fetch(`${BASE_URL}/payout/${payoutId}/process`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payout/${payoutId}/process`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

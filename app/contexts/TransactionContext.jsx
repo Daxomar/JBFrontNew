@@ -6,7 +6,10 @@ import toast from "react-hot-toast"
 
 const TransactionContext = createContext(null)
 
-const BASE_URL = "https://2c8186ee0c04.ngrok-free.app/api/v1"
+
+
+//test
+
 
 export function TransactionProvider({ children }) {
     console.log("🔵 TransactionProvider mounted")
@@ -28,13 +31,15 @@ export function TransactionProvider({ children }) {
             if (sortBy) params.append("sortBy", sortBy)
             if (sortOrder) params.append("sortOrder", sortOrder)
 
-            const response = await fetch(`${BASE_URL}/transaction?${params.toString()}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transaction?${params.toString()}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "ngrok-skip-browser-warning": "true"
                 },
+                credentials: "include",
             })
+
 
             if (!response.ok) {
                 const err = await response.json().catch(() => ({}))

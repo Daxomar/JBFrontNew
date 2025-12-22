@@ -47,7 +47,7 @@ const fetchBundles = async () => {
 
 
 
- 
+
 
 
 export default function BuyPage() {
@@ -64,13 +64,13 @@ export default function BuyPage() {
   const [emailAddress, setEmailAddress] = useState("")
   const [verifying, setVerifying] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
- // Initialize state directly from localStorage
-const [resellerCode, setResellerCode] = useState(() => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("resellerCode") || "";
-  }
-  return "";
-});
+  // Initialize state directly from localStorage
+  const [resellerCode, setResellerCode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("resellerCode") || "";
+    }
+    return "";
+  });
 
 
   //This particular state is to hold payment data so i can let users see their payment details after successful payment
@@ -78,7 +78,7 @@ const [resellerCode, setResellerCode] = useState(() => {
 
 
 
-   //UseEffect for getting the reseller Code from localStorage if it exists
+  //UseEffect for getting the reseller Code from localStorage if it exists
   //   useEffect(() => {
   //     const code = localStorage.getItem("resellerCode");
   //     if (code) {
@@ -93,60 +93,160 @@ const [resellerCode, setResellerCode] = useState(() => {
 
 
 
-const fetchResellerCommission = async () => {
-  try {
-    // If no reseller code, return null (no commission)
-    if (!resellerCode) {
-      return {
-        success: true,
-        data: null, // No reseller
-        message: "No reseller code found"
-      };
-    }
-    
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/public/commission/${resellerCode}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true"
-      },
-    });
-    
-    // Handle non-2xx errors
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      
-      // If reseller not found, return null (don't show error toast)
-      if (response.status === 404) {
-        console.warn("Reseller code not found:", resellerCode);
+
+
+  const fetchResellerBundlePrices = async () => {
+    try {
+      // If no reseller code, return null (no commission)
+      if (!resellerCode) {
         return {
           success: true,
-          data: null,
-          message: "Reseller not found"
+          data: null, // No reseller
+          message: "No reseller code found"
         };
       }
-      
-      throw new Error(err.message || "Failed to fetch reseller commission ");
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/resellerBundlePrice/public/${resellerCode}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
+        },
+      });
+
+      // Handle non-2xx errors
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+
+        // If reseller not found, return null (don't show error toast)
+        if (response.status === 404) {
+          console.warn("Reseller code not found:", resellerCode);
+          return {
+            success: true,
+            data: null,
+            message: "Reseller not found"
+          };
+        }
+
+        throw new Error(err.message || "Failed to fetch reseller commission ");
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to fetch commission");
+      }
+
+      console.log("Fetched reseller commission:", data);
+      return data.data; // { success, data: { resellerCode, commissionRate, name } }
+
+    } catch (error) {
+      console.error("Fetch reseller commission error:", error.message);
+      toast.error(error.message || "Error fetching reseller info");
+      throw error;
     }
-    
-    const data = await response.json();
-    
-    if (!data.success) {
-      throw new Error(data.message || "Failed to fetch commission");
-    }
-    
-    console.log("Fetched reseller commission:", data);
-    return data.data; // { success, data: { resellerCode, commissionRate, name } }
-    
-  } catch (error) {
-    console.error("Fetch reseller commission error:", error.message);
-    toast.error(error.message || "Error fetching reseller info");
-    throw error;
-  }
-};
+  };
 
 
- const {
+  const {
+    data: resellerBundlePrices,
+    isLoading: isLoadingResellerBundlePrices,
+    isError: isErrorResellerBundlePrices,
+    // refetch: refetchReseller,
+  } = useQuery({
+    queryKey: ["ResellerBundlePrices"],
+    queryFn: fetchResellerBundlePrices,
+
+  });
+
+
+
+  console.log("RESELLER BUNDLE PRICES OVER HERE", resellerBundlePrices)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const fetchResellerCommission = async () => {
+    try {
+      // If no reseller code, return null (no commission)
+      if (!resellerCode) {
+        return {
+          success: true,
+          data: null, // No reseller
+          message: "No reseller code found"
+        };
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/public/commission/${resellerCode}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
+        },
+      });
+
+      // Handle non-2xx errors
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+
+        // If reseller not found, return null (don't show error toast)
+        if (response.status === 404) {
+          console.warn("Reseller code not found:", resellerCode);
+          return {
+            success: true,
+            data: null,
+            message: "Reseller not found"
+          };
+        }
+
+        throw new Error(err.message || "Failed to fetch reseller commission ");
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to fetch commission");
+      }
+
+      console.log("Fetched reseller commission:", data);
+      return data.data; // { success, data: { resellerCode, commissionRate, name } }
+
+    } catch (error) {
+      console.error("Fetch reseller commission error:", error.message);
+      toast.error(error.message || "Error fetching reseller info");
+      throw error;
+    }
+  };
+
+
+  const {
     data: resellerData,
     isLoading: isLoadingReseller,
     isError: isErrorReseller,
@@ -154,20 +254,20 @@ const fetchResellerCommission = async () => {
   } = useQuery({
     queryKey: ["resellerCommission"],
     queryFn: fetchResellerCommission,
-    
+
   });
 
 
 
-//   const {
-//   data,
-//   isLoading,
-//   isError,
-//   refetch,
-// } = useQuery({
-//   queryKey: ["bundles"],
-//   queryFn: fetchBundles,
-// });
+  //   const {
+  //   data,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = useQuery({
+  //   queryKey: ["bundles"],
+  //   queryFn: fetchBundles,
+  // });
 
 
   console.log("Current reseller data:", resellerData);
@@ -178,13 +278,13 @@ const fetchResellerCommission = async () => {
   const verifyPayment = async (reference) => {
     setVerifying(true);
     setError(null);
-    
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/paystack/verify/${reference}`,
         {
           method: 'GET',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             "ngrok-skip-browser-warning": "true"
           }
@@ -193,7 +293,7 @@ const fetchResellerCommission = async () => {
 
       const data = await response.json();
       console.log('Payment verification response:', data);
-     //might need to change this to data.data.status later
+      //might need to change this to data.data.status later
 
       if (response.ok && data.status) {
         console.log("That specicifi UI thingy is happening")
@@ -218,13 +318,13 @@ const fetchResellerCommission = async () => {
 
 
 
-useEffect(() => {
+  useEffect(() => {
     const reference = searchParams.get('reference');
-    
+
     // If there's a reference in the URL, verify the payment
-    if (reference) {  
-         // Immediately wipe the URL so the user never sees the reference version
-    router.replace("/buy");
+    if (reference) {
+      // Immediately wipe the URL so the user never sees the reference version
+      router.replace("/buy");
       verifyPayment(reference);
     }
   }, [searchParams]);
@@ -233,67 +333,70 @@ useEffect(() => {
 
 
 
- //CALLING BUNDLE FROM BACKEND USING FETCH API 
-const fetchBundles = async () => {
-  try {
-    //I will replace this with the BASE_URL from .env later
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/bundles/getBundleFromDb`, {
-      method: "GET",
-      headers: { 
-        "Content-Type": "application/json",
-         "ngrok-skip-browser-warning": "true"
-       },
-    });
+  //CALLING BUNDLE FROM BACKEND USING FETCH API 
+  const fetchBundles = async () => {
+    try {
+      //I will replace this with the BASE_URL from .env later
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/bundles/getBundleFromDb`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
+        },
+      });
 
-    // Handle non-2xx errors
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.message || "Something went wrong");
+      // Handle non-2xx errors
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || "Something went wrong");
+      }
+
+      // Parse JSON
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to fetch bundles");
+      }
+
+      toast.success(data.message);
+      console.log("Fetched bundles:", data);
+
+      return data;
+      //  { success, message, data: bundles }
+    } catch (error) {
+      console.error("Fetch bundles error:", error.message);
+      toast.error(error.message || "Unexpected error");
+      throw error;
     }
-
-    // Parse JSON
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.message || "Failed to fetch bundles");
-    }
-
-    toast.success(data.message);
-    console.log("Fetched bundles:", data);
-
-    return data; 
-    //  { success, message, data: bundles }
-  } catch (error) {
-    console.error("Fetch bundles error:", error.message);
-    toast.error(error.message || "Unexpected error");
-    throw error;
-  }
-};
+  };
 
 
   // useQuery hook
-const {
-  data,
-  isLoading,
-  isError,
-  refetch,
-} = useQuery({
-  queryKey: ["bundles"],
-  queryFn: fetchBundles,
-  enabled: !!resellerData?.commissionRate
-});
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["bundles"],
+    queryFn: fetchBundles,
+    enabled: !!resellerData?.commissionRate
+  });
 
-console.log("This is current data:", data);
-
-
-
-//The actuaal data bundle
-const bundles = data?.data || [];
-console.log("Bundles to display:", bundles);
+  console.log("This is current data:", data);
 
 
 
-  const filteredBundles = bundles?.filter((b) => b.network === selectedNetwork) || []
+  //The actuaal data bundle
+  const bundles = data?.data || [];
+  console.log("Bundles to display:", bundles);
+
+
+
+
+  //Original
+  // const filteredBundles = bundles?.filter((b) => b.network === selectedNetwork) || []
+  const filteredBundles = resellerBundlePrices?.filter((b) => b.network === selectedNetwork) || []
 
   const handleNetworkSelect = (networkId) => {
     setSelectedNetwork(networkId)
@@ -313,45 +416,45 @@ console.log("Bundles to display:", bundles);
   const handlePayment = async (e) => {
     e.preventDefault()
     setProcessing(true)
-   try {
-    // Call your backend to initialize payment
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/paystack/initialize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: emailAddress,
-        amount: selectedBundle.JBSP, // Paystack expects amount in kobo/pesewas
-        bundleId: selectedBundle.Bundle_id,
-        phoneNumberReceivingData: phoneNumber,
-        resellerCode: resellerCode,
-        callback_url: "http://localhost:3000/buy"
-       
-      })
-    });
+    try {
+      // Call your backend to initialize payment
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/paystack/initialize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailAddress,
+          amount: selectedBundle.price, // Paystack expects amount in kobo/pesewas
+          bundleId: selectedBundle.Bundle_id,
+          phoneNumberReceivingData: phoneNumber,
+          resellerCode: resellerCode,
+          callback_url: "http://localhost:3000/buy"
 
-    const data = await response.json();
-   
-    console.log('Payment initialization response on frontend:', data);
+        })
+      });
+
+      const data = await response.json();
+
+      console.log('Payment initialization response on frontend:', data);
 
 
 
-    if (!data.status) {
-      throw new Error(data.message || 'Payment initialization failed');
+      if (!data.status) {
+        throw new Error(data.message || 'Payment initialization failed');
+      }
+
+
+      console.log('Redirecting to Paystack checkout:', data.data.data.authorization_url);  // something fishy here will check later 
+      console.log
+
+      // Redirect to Paystack checkout
+      window.location.href = data.data.data.authorization_url;
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error(error.message || 'Failed to initialize payment');
+      setProcessing(false);
     }
-
-
-   console.log('Redirecting to Paystack checkout:', data.data.data.authorization_url);  // something fishy here will check later 
-   console.log
-
-    // Redirect to Paystack checkout
-    window.location.href = data.data.data.authorization_url;
-
-  } catch (error) {
-    console.error('Payment error:', error);
-    toast.error(error.message || 'Failed to initialize payment');
-    setProcessing(false);
   }
-}
 
 
 
@@ -363,18 +466,18 @@ console.log("Bundles to display:", bundles);
             <img src="/logo.jpg" alt="Joy Data" className="h-8 w-8 rounded border border-slate-100" />
             <span className="font-bold text-lg text-slate-900">Joy Online</span>
           </div>
-          
+
           {/* Desktop Nav */}
           <nav className="hidden sm:flex items-center gap-4">
-            <Link 
-              href="/track-order" 
+            <Link
+              href="/track-order"
               className="text-sm font-medium text-slate-600 hover:text-cyan-600 transition-colors flex items-center gap-1"
             >
               <Search className="h-4 w-4" />
               Track Order
             </Link>
-            <Link 
-              href="/support" 
+            <Link
+              href="/support"
               className="text-sm font-medium text-slate-600 hover:text-cyan-600 transition-colors flex items-center gap-1"
             >
               <HelpCircle className="h-4 w-4" />
@@ -406,7 +509,7 @@ console.log("Bundles to display:", bundles);
           </div>
         </div>
       </header>
-      
+
 
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md py-8">
@@ -437,8 +540,8 @@ console.log("Bundles to display:", bundles);
                 {step === 3 && "Enter Details"}
 
                 {/* THIS IS THE PROCESS WE HAVE TO INTEGRATE PAYMENT GATEWAY IN DELA */}
-                {step === 5 && "Order Confirmed"}    
-              
+                {step === 5 && "Order Confirmed"}
+
               </CardTitle>
               <CardDescription>
                 {step === 1 && "Which network do you want to top up?"}
@@ -451,7 +554,7 @@ console.log("Bundles to display:", bundles);
 
 
 
-        {/* // SELECTING NETWORK -----NOTE DELA */}
+            {/* // SELECTING NETWORK -----NOTE DELA */}
             <CardContent>
               {step === 1 && (
                 <div className="grid grid-cols-1 gap-3">
@@ -477,7 +580,7 @@ console.log("Bundles to display:", bundles);
 
 
 
-          {/* SELECTING BUNDLE ----NOTE DELA*/}
+              {/* SELECTING BUNDLE ----NOTE DELA*/}
               {step === 2 && (
                 <div className="space-y-4">
                   {isLoading ? (
@@ -491,7 +594,7 @@ console.log("Bundles to display:", bundles);
                       {/* DISPLAYS FILTERED BUNDLES BASED ON NETWORK SELECTED -----NOTE DELA */}
                       {filteredBundles.map((bundle) => (
                         <button
-                         //I have changed the bundle.id to bundle.Bundle_id to match the backend data structure -----NOTE DELA
+                          //I have changed the bundle.id to bundle.Bundle_id to match the backend data structure -----NOTE DELA
                           key={bundle.Bundle_id}
                           onClick={() => handleBundleSelect(bundle)}
                           className="flex items-center justify-between p-4 rounded-lg border hover:border-primary hover:bg-blue-50 transition-all bg-white group"
@@ -499,7 +602,8 @@ console.log("Bundles to display:", bundles);
                           <span className="font-medium group-hover:text-primary">{bundle.name}</span>
                           <Badge variant="secondary" className="text-base px-3 py-1">
                             {/* //WOULD HAVE TO DISPLAY PRICE AFTER MULTIPLYING BY RESELLERS COMMISSION RATE -------NOTE DELA*/}
-                            {formatCurrency( bundle.JBSP + (bundle.JBSP * resellerData.commissionRate / 100))}     
+                            {/* {formatCurrency( bundle.JBSP + (bundle.JBSP * resellerData.commissionRate / 100))}      */}
+                            {formatCurrency(bundle?.price)}
                           </Badge>
                         </button>
                       ))}
@@ -535,15 +639,21 @@ console.log("Bundles to display:", bundles);
                       <span className="text-slate-500">Bundle</span>
                       <span className="font-medium">{selectedBundle?.name}</span>
                     </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Fees</span>
+                      <span className="font-medium">{selectedBundle?.price * 0.02}</span>
+                    </div>
                     <div className="border-t pt-2 mt-2 flex justify-between">
                       <span className="font-bold">Total</span>
 
                       {/* //ONCE AGAIN WOULD HAVE TO DISPLAY PRICE AFTER MULTIPLYING BY RESELLERS COMMISSION RATE -------NOTE DELA */}
-                      <span className="font-bold text-primary text-lg">{formatCurrency( selectedBundle?.JBSP + (selectedBundle?.JBSP * resellerData.commissionRate / 100))}</span>
+                      {/* <span className="font-bold text-primary text-lg">{formatCurrency( selectedBundle?.JBSP + (selectedBundle?.JBSP * resellerData.commissionRate / 100))}</span> */}
+                      <span className="font-bold text-primary text-lg">{formatCurrency(selectedBundle?.price + (selectedBundle?.price * 0.02))}</span>
                     </div>
                   </div>
 
-                  
+
 
                   <Alert variant="destructive" className="bg-amber-50 text-amber-900 border-amber-200">
                     <AlertTriangle className="h-4 w-4 text-amber-600 mt-4" />
@@ -556,16 +666,16 @@ console.log("Bundles to display:", bundles);
                   </Alert>
 
                   <div className="space-y-2">
-                  <Label htmlFor="phone">Email Address</Label>
+                    <Label htmlFor="phone">Email Address</Label>
                     <Input
-                        id="email"
-                        type="email"
-                        placeholder="example@gmail.com"
-                        value={emailAddress}
-                        onChange={(e) => setEmailAddress(e.target.value)}
-                        className="text-lg tracking-widest"
-                        required
-                      />
+                      id="email"
+                      type="email"
+                      placeholder="example@gmail.com"
+                      value={emailAddress}
+                      onChange={(e) => setEmailAddress(e.target.value)}
+                      className="text-lg tracking-widest"
+                      required
+                    />
 
 
 
@@ -615,10 +725,10 @@ console.log("Bundles to display:", bundles);
                     {
                       paymentStatus === 'success' ? (
                         <p className="text-slate-500 max-w-[260px] mx-auto"> Your {selectedBundle?.name} bundle is being processed and will be delivered to {phoneNumber}{" "}
-                      shortly. Thank you for choosing Joy Data! kindly copy your reference to track bundle {paymentData.reference}</p>
-                      ) :  (
+                          shortly. Thank you for choosing Joy Data! kindly copy your reference to track bundle {paymentData.reference}</p>
+                      ) : (
                         <p className="text-red-600  max-w-[260px] mx-auto">Your payment failed. Please try again.</p>
-                      ) 
+                      )
                     }
 
                     {/* <p className="text-slate-500 max-w-[260px] mx-auto">

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 
 // Imports i added myself
 import { UserProvider, useUser } from "../contexts/UserContext"
-
+import {AuthProvider, useAuth } from "../contexts/AuthContext"
 
 
 
@@ -178,8 +178,13 @@ export default function ResellerLayout({ children }) {
   console.log("ResellerLayout rendered")
 
   return (
-    <UserProvider>
-      <ResellerLayoutContent>{children}</ResellerLayoutContent>
-    </UserProvider>
+   <AuthProvider>  
+      <UserProvider>
+        <ResellerLayoutContent>
+          {children}
+        </ResellerLayoutContent>
+      </UserProvider>
+  </AuthProvider>
+
   )
 }

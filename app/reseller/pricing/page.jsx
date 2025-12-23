@@ -1173,7 +1173,7 @@ export default function ResellerPricingPage() {
               <p className="text-sm font-semibold text-blue-900">How it works</p>
               <p className="text-sm text-blue-700 mt-1">
                 Set your selling price for each bundle. Your price must be equal to or above the base price. 
-                The difference between your price and the base price is your commission per sale.
+                The difference between your price and the base price is your profit per sale.
               </p>
             </div>
           </div>
@@ -1198,7 +1198,8 @@ export default function ResellerPricingPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Network</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Price</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Your Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recommend Range</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
@@ -1247,6 +1248,12 @@ export default function ResellerPricingPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`font-bold ${commission > 0 ? 'text-green-600' : 'text-gray-400'}`}>
                           +{formatCurrency(commission)}
+                        </span>
+                      </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="">
+                          {bundle.recommendedRange}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">

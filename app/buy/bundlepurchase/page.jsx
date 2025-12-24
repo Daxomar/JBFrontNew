@@ -23,6 +23,7 @@ import 'ldrs/react/Waveform.css'
 import { BASE_URL } from "@/lib/api/client"
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+
 import { useRouter, useSearchParams } from "next/navigation";
 
 // Mock API function
@@ -324,7 +325,7 @@ export default function BuyPage() {
     // If there's a reference in the URL, verify the payment
     if (reference) {
       // Immediately wipe the URL so the user never sees the reference version
-      router.replace(`/buy?resellerCode=${resellerCode}`);
+      router.replace(`/buy/bundlepurchase?resellerCode=${resellerCode}`);
       verifyPayment(reference);
     }
   }, [searchParams]);

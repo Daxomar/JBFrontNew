@@ -428,7 +428,7 @@ export default function BuyPage() {
           bundleId: selectedBundle?.Bundle_id,
           phoneNumberReceivingData: phoneNumber,
           resellerCode: resellerCode,
-          callback_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}?resellerCode=${resellerCode}` 
+          callback_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/buy/bundlepurchase?resellerCode=${resellerCode}` 
           
 
         })

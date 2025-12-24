@@ -1,7 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState,useEffect } from "react"
-
+import { fetchWithAuth } from "@/lib/utility/fetchWithAuth"
+ 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
@@ -20,6 +21,61 @@ export function AuthProvider({ children }) {
 
 
 
+  //  const verifyAuthWithBackend = async () => {
+
+
+  //   try {
+  //     console.log("🔍 Verifying authentication with backend...")
+  //     setIsLoggedIn(false)
+  //     setIsLoading(true)
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/is-auth`,
+  //       {
+  //         method: "GET",
+  //         credentials: "include", // Send JWT cookie
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "ngrok-skip-browser-warning": "true",
+  //         },
+  //       }
+  //     )
+
+  //     if (response.ok) {
+  //       const data = await response.json()
+        
+  //       if (data.success && data.user) {
+  //         console.log("✅ Authentication verified:", data.user.email)
+         
+          
+  //         // Sync to localStorage as backup (but backend is source of truth)
+  //         setLoadedUser(data.user)
+  //         localStorage.setItem("user", JSON.stringify(data.user))
+  //         setIsLoggedIn(true)
+  //         setIsLoading(false)
+  //       } else {
+  //         console.log("❌ Authentication failed: No user data")
+  //         clearAuth()
+
+  //       }
+  //     } else {
+  //       console.log("❌ Authentication failed: Invalid token")
+  //       clearAuth()
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Auth verification error:", error)
+  //     clearAuth()
+  //   } finally {
+  //     setIsLoading(false)
+    
+  //   }
+  // }
+
+
+
+
+
+
+
    const verifyAuthWithBackend = async () => {
 
 
@@ -27,16 +83,11 @@ export function AuthProvider({ children }) {
       console.log("🔍 Verifying authentication with backend...")
       setIsLoggedIn(false)
       setIsLoading(true)
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/is-auth`,
+      const response = await fetchWithAuth(
+        `/auth/is-auth`,
         {
           method: "GET",
-          credentials: "include", // Send JWT cookie
-          headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
+        },
       )
 
       if (response.ok) {
@@ -68,7 +119,6 @@ export function AuthProvider({ children }) {
     
     }
   }
-
 
 
 

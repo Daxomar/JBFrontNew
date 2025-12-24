@@ -324,7 +324,7 @@ export default function BuyPage() {
     // If there's a reference in the URL, verify the payment
     if (reference) {
       // Immediately wipe the URL so the user never sees the reference version
-      router.replace("/buy");
+      router.replace(`/buy?resellerCode=${resellerCode}`);
       verifyPayment(reference);
     }
   }, [searchParams]);
@@ -423,11 +423,12 @@ export default function BuyPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: emailAddress,
-          amount: selectedBundle.price, // Paystack expects amount in kobo/pesewas
-          bundleId: selectedBundle.Bundle_id,
+          amount: selectedBundle?.price + (selectedBundle?.price * 0.02), // Paystack expects amount in kobo/pesewas
+          bundleId: selectedBundle?.Bundle_id,
           phoneNumberReceivingData: phoneNumber,
           resellerCode: resellerCode,
-          callback_url: "http://localhost:3000/buy"
+          callback_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}?resellerCode=${resellerCode}` 
+          
 
         })
       });

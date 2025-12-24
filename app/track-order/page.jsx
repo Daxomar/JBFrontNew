@@ -10,7 +10,7 @@ import { Search, Package, CheckCircle, Clock, XCircle, Home, Phone, Calendar, Lo
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://2c8186ee0c04.ngrok-free.app/api/v1"
+
 
 // API function to track orders
 const trackOrdersByPhone = async (phoneNumber, page = 1) => {
